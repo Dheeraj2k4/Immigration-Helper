@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Footer } from '@/components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -169,48 +170,6 @@ const visaTypes: VisaType[] = [
         title: 'Sponsorship Documents',
         description: 'Company registration and sponsorship license',
         icon: Building
-      }
-    ]
-  },
-  {
-    id: 'business',
-    name: 'Business Visa',
-    items: [
-      {
-        id: 'passport',
-        title: 'Passport Copy',
-        description: 'Valid for at least 6 months',
-        icon: FileText
-      },
-      {
-        id: 'application',
-        title: 'Business Visa Application',
-        description: 'Business purpose application form',
-        icon: FileText
-      },
-      {
-        id: 'photo',
-        title: 'Recent Passport-size Photo',
-        description: 'Professional business photograph',
-        icon: Camera
-      },
-      {
-        id: 'invitation',
-        title: 'Business Invitation Letter',
-        description: 'Invitation from host company or organization',
-        icon: Mail
-      },
-      {
-        id: 'company',
-        title: 'Company Registration',
-        description: 'Business registration and incorporation documents',
-        icon: Building
-      },
-      {
-        id: 'itinerary',
-        title: 'Business Itinerary',
-        description: 'Detailed schedule of business activities',
-        icon: Plane
       }
     ]
   }
@@ -453,8 +412,15 @@ function ActionButtons({
 
 // Main Checklist Component
 export function Checklist() {
-  const [selectedVisaType, setSelectedVisaType] = useState('tourist');
+  const location = useLocation();
+  const initialVisaType = (location.state as { visaType?: string })?.visaType || 'tourist';
+  const [selectedVisaType, setSelectedVisaType] = useState(initialVisaType);
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Initialize checklist items when visa type changes
   useEffect(() => {

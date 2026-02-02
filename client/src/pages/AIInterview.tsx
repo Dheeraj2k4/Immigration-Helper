@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Footer } from '@/components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -168,13 +168,17 @@ function WebcamPreview({
   isMicOn, 
   isRecording, 
   onToggleCamera, 
-  onToggleMic 
+  onToggleMic,
+  videoRef,
+  audioLevel
 }: {
   isCameraOn: boolean;
   isMicOn: boolean;
   isRecording: boolean;
   onToggleCamera: () => void;
   onToggleMic: () => void;
+  videoRef: React.RefObject<HTMLVideoElement>;
+  audioLevel: number;
 }) {
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 mb-6">
@@ -182,18 +186,25 @@ function WebcamPreview({
       
       <div className="relative">
         {/* Webcam Preview Area */}
-        <div className={`relative bg-gray-900 rounded-xl overflow-hidden aspect-video mb-4 ${
+        <div className={`relative bg-gray-900 rounded-xl overflow-hidden mb-4 ${
           isMicOn && isRecording ? 'ring-4 ring-green-400 ring-opacity-50' : ''
-        }`}>
+        }`} style={{ aspectRatio: '16/9' }}>
           {isCameraOn ? (
-            <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
-              <Camera className="w-16 h-16 text-gray-400" />
+            <>
+              <video 
+                ref={videoRef}
+                autoPlay 
+                playsInline 
+                muted
+                className="w-full h-full object-cover"
+                style={{ transform: 'scaleX(-1)' }}
+              />
               <span className="absolute bottom-4 left-4 text-white text-sm bg-black bg-opacity-50 px-2 py-1 rounded">
                 Camera Preview
               </span>
-            </div>
+            </>
           ) : (
-            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center" style={{ minHeight: '400px' }}>
               <CameraOff className="w-16 h-16 text-gray-500" />
               <span className="absolute bottom-4 left-4 text-gray-400 text-sm">
                 Camera Off
@@ -206,6 +217,30 @@ function WebcamPreview({
             <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full text-sm">
               <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
               Recording
+            </div>
+          )}
+          
+          {/* Audio Level Indicator */}
+          {isMicOn && (
+            <div className="absolute bottom-4 right-4 bg-black bg-opacity-50 px-3 py-2 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Mic className="w-4 h-4 text-white" />
+                <div className="flex gap-1 items-end h-6">
+                  {[...Array(10)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`w-1 rounded-full transition-all duration-150 ${
+                        i < Math.floor(audioLevel / 10) 
+                          ? 'bg-green-400' 
+                          : 'bg-gray-600'
+                      }`}
+                      style={{ 
+                        height: `${(i + 1) * 10}%`
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -359,10 +394,145 @@ export function AIInterview() {
   const [isRecording, setIsRecording] = useState(false);
   const [transcriptText, setTranscriptText] = useState('');
   const [timeLeft, setTimeLeft] = useState('05:00');
+  const [audioLevel, setAudioLevel] = useState(0);
   const showTips = false;
+  
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoStreamRef = useRef<MediaStream | null>(null);
+  const audioStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   const currentQuestion = interviewQuestions[currentQuestionIndex];
   const totalQuestions = interviewQuestions.length;
+
+  // Handle camera toggle
+  const handleToggleCamera = async () => {
+    if (!isCameraOn) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: true,
+          audio: false
+        });
+        
+        videoStreamRef.current = stream;
+        
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        
+        setIsCameraOn(true);
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        alert('Unable to access camera. Please check your permissions.');
+      }
+    } else {
+      if (videoStreamRef.current) {
+        videoStreamRef.current.getTracks().forEach(track => track.stop());
+        videoStreamRef.current = null;
+      }
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+      }
+      
+      setIsCameraOn(false);
+    }
+  };
+
+  // Handle microphone toggle
+  const handleToggleMic = async () => {
+    if (!isMicOn) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          audio: true,
+          video: false
+        });
+        
+        audioStreamRef.current = stream;
+        
+        // Set up audio analysis
+        const audioContext = new AudioContext();
+        const analyser = audioContext.createAnalyser();
+        const microphone = audioContext.createMediaStreamSource(stream);
+        
+        analyser.fftSize = 256;
+        microphone.connect(analyser);
+        
+        audioContextRef.current = audioContext;
+        analyserRef.current = analyser;
+        
+        // Start monitoring audio level
+        const monitorAudioLevel = () => {
+          if (analyserRef.current) {
+            const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
+            analyserRef.current.getByteFrequencyData(dataArray);
+            
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            setAudioLevel(Math.min(100, average));
+          }
+          
+          animationFrameRef.current = requestAnimationFrame(monitorAudioLevel);
+        };
+        
+        monitorAudioLevel();
+        
+        setIsMicOn(true);
+      } catch (error) {
+        console.error('Error accessing microphone:', error);
+        alert('Unable to access microphone. Please check your permissions.');
+      }
+    } else {
+      // Stop audio analysis
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => track.stop());
+        audioStreamRef.current = null;
+      }
+      
+      setAudioLevel(0);
+      setIsMicOn(false);
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (videoStreamRef.current) {
+        videoStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+      
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+
+  // Ensure video stream stays connected to video element
+  useEffect(() => {
+    if (isCameraOn && videoStreamRef.current && videoRef.current) {
+      if (videoRef.current.srcObject !== videoStreamRef.current) {
+        videoRef.current.srcObject = videoStreamRef.current;
+      }
+    }
+  }, [isCameraOn, isMicOn]); // Re-run when mic state changes to ensure video doesn't disconnect
 
   // Timer effect
   useEffect(() => {
@@ -471,8 +641,10 @@ export function AIInterview() {
           isCameraOn={isCameraOn}
           isMicOn={isMicOn}
           isRecording={isRecording}
-          onToggleCamera={() => setIsCameraOn(prev => !prev)}
-          onToggleMic={() => setIsMicOn(prev => !prev)}
+          onToggleCamera={handleToggleCamera}
+          onToggleMic={handleToggleMic}
+          videoRef={videoRef}
+          audioLevel={audioLevel}
         />
 
         <AnswerDisplay 

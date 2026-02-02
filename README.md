@@ -1,103 +1,213 @@
-# RouteX Frontend
+# Immigration Helper
 
-A modern React-based frontend application for RouteX visa assistance platform. Built with Vite, Tailwind CSS, and modern React patterns for a seamless visa application experience.
+A full-stack web application to help with immigration processes, visa guides, AI-powered interviews, and more.
 
-## 🌟 Features
+## 🏗️ Project Structure
 
-- **Modern Tech Stack**: React 19, Vite, TypeScript, Tailwind CSS
-- **Responsive Design**: Mobile-first design that works on all devices
-- **Component Library**: Built with shadcn/ui components for consistency
-- **Smooth Animations**: Framer Motion for delightful user interactions
-- **Internationalization**: Ready for multiple languages with react-i18next
-- **Accessibility**: WCAG compliant with semantic HTML and ARIA attributes
-- **State Management**: Zustand for efficient app state management
-- **Type Safety**: Full TypeScript support for better development experience
+```
+immigration-helper/
+├── client/              # Frontend (React + Vite + TypeScript)
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── layouts/
+│   │   ├── lib/
+│   │   ├── pages/
+│   │   ├── App.tsx
+│   │   ├── index.css
+│   │   └── main.tsx
+│   ├── public/
+│   ├── index.html
+│   ├── vite.config.ts
+│   └── package.json
+├── server/              # Backend (Node.js + Express + TypeScript)
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── middleware/
+│   │   ├── services/
+│   │   ├── config/
+│   │   ├── utils/
+│   │   ├── types/
+│   │   └── server.ts
+│   ├── tests/
+│   ├── .env.example
+│   └── package.json
+├── package.json         # Root (monorepo scripts)
+└── README.md
+```
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ 
-- npm or yarn
+- Node.js (v18 or higher)
+- npm
+- MongoDB (local or Atlas)
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd ProjectStage1
-   ```
+Install all dependencies for both client and server:
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-4. **Open your browser**
-   Navigate to `http://localhost:5173`
-
-## 📁 Project Structure
-
-```
-src/
-├── assets/          # Images, icons, and static assets
-├── components/      # Reusable UI components
-│   ├── ui/         # Base UI components (Button, Card, etc.)
-│   └── Navbar.tsx  # Navigation component
-├── layouts/         # Layout components
-│   └── MainLayout.tsx
-├── pages/           # Page components
-│   ├── Home.tsx
-│   ├── VisaGuide.tsx
-│   ├── AIInterview.tsx
-│   ├── Updates.tsx
-│   ├── Plans.tsx
-│   ├── About.tsx
-│   ├── FAQ.tsx
-│   └── Contact.tsx
-├── hooks/           # Custom React hooks
-├── store/           # Zustand stores
-├── services/        # API services and mock data
-├── i18n/            # Internationalization files
-├── lib/             # Utility functions
-└── styles/          # Global styles and Tailwind config
+```bash
+npm run install:all
 ```
 
-## 🎨 Design System
+Or install separately:
 
-### Colors
-- **Primary**: `#034833` (Dark Green)
-- **Secondary**: `#83CD20` (Light Green)
-- **Background**: White with subtle gray tones
-- **Text**: Various shades based on hierarchy
+```bash
+# Install root dependencies
+npm install
 
-### Typography
-- **Font**: Plus Jakarta Sans
-- **Sizes**: 
-  - Logo: 32px
-  - Navigation: 15px
-  - Buttons: 14px
-  - Hero: 80px
+# Install client dependencies
+cd client && npm install
 
-### Components
-- **Rounded corners**: Consistent border radius
-- **Shadows**: Subtle elevation for cards
-- **Hover states**: Smooth transitions on interactive elements
+# Install server dependencies
+cd ../server && npm install
+```
 
-## 🔧 Available Scripts
+### Environment Setup
 
-- `npm run dev` - Start development server
+1. Create `.env` file in the `server/` folder:
+```bash
+cd server
+cp .env.example .env
+```
+
+2. Update the `.env` file with your configuration:
+   - MongoDB URI
+   - JWT Secret
+   - CORS origin
+   - API keys
+
+### Running the Application
+
+#### Development Mode (Both client and server)
+
+```bash
+npm run dev
+```
+
+This will start:
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:5000
+
+#### Run Separately
+
+```bash
+# Run only frontend
+npm run dev:client
+
+# Run only backend
+npm run dev:server
+```
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+### Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run client tests only
+npm run test:client
+
+# Run server tests only
+npm run test:server
+```
+
+## 📦 Tech Stack
+
+### Frontend (Client)
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **TailwindCSS** - Styling
+- **React Router** - Navigation
+- **Framer Motion** - Animations
+- **Zustand** - State management
+- **Axios** - HTTP client
+
+### Backend (Server)
+- **Node.js** - Runtime
+- **Express** - Web framework
+- **TypeScript** - Type safety
+- **MongoDB** - Database
+- **Mongoose** - ODM
+- **JWT** - Authentication
+- **Helmet** - Security
+- **Morgan** - Logging
+
+## 🎯 Features
+
+- 🗺️ **Visa Guide** - Comprehensive visa information
+- ✅ **Immigration Checklist** - Track your progress
+- 🤖 **AI Interview Practice** - Prepare for interviews
+- 📰 **Latest Updates** - Immigration news and updates
+- 🔐 **Authentication** - Secure user accounts (Coming Soon)
+
+## 📝 Available Scripts
+
+### Root Level
+- `npm run install:all` - Install all dependencies
+- `npm run dev` - Run both client and server in development
+- `npm run build` - Build both client and server
+- `npm start` - Start both in production mode
+- `npm test` - Run all tests
+- `npm run lint` - Lint all code
+
+### Client Scripts (in client/ folder)
+- `npm run dev` - Start Vite dev server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
+- `npm run lint` - Lint frontend code
 
-## 📱 Features Implemented
+### Server Scripts (in server/ folder)
+- `npm run dev` - Start server with hot reload
+- `npm run build` - Build TypeScript
+- `npm start` - Start production server
+- `npm test` - Run backend tests
+- `npm run lint` - Lint backend code
+
+## 🔧 Development
+
+### Adding New Features
+
+1. **Frontend Feature**:
+   - Add components in `client/src/components/`
+   - Add pages in `client/src/pages/`
+   - Update routes in `client/src/App.tsx`
+
+2. **Backend Feature**:
+   - Create model in `server/src/models/`
+   - Add controller in `server/src/controllers/`
+   - Define routes in `server/src/routes/`
+   - Register routes in `server/src/server.ts`
+
+### Code Style
+
+- Follow TypeScript best practices
+- Use ESLint and Prettier for formatting
+- Write meaningful commit messages
+- Add comments for complex logic
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+ISC
 
 ### ✅ Home Page
 - Hero section with large call-to-action

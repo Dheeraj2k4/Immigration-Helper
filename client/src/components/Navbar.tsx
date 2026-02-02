@@ -69,8 +69,9 @@ export function Navbar() {
                       initial={false}
                       transition={{
                         type: "spring",
-                        stiffness: 500,
-                        damping: 30
+                        stiffness: 380,
+                        damping: 35,
+                        mass: 0.8
                       }}
                     />
                   )}
