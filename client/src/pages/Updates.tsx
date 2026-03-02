@@ -4,11 +4,13 @@ import { Search, Calendar, ExternalLink, Loader2, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/Footer';
 import { useImmigrationNews, useTopImmigrationHeadlines, NewsCategory, Country } from '@/hooks/useNews';
+import { useTranslation } from 'react-i18next';
 
 export function Updates() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCountry, setSelectedCountry] = useState<Country | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<NewsCategory | undefined>();
+  const { t } = useTranslation();
   
   const { articles, loading, error } = useImmigrationNews(1, 10, selectedCountry, selectedCategory);
   const { articles: topHeadlines } = useTopImmigrationHeadlines(3);
@@ -31,8 +33,8 @@ export function Updates() {
           transition={{ duration: 0.6 }}
         >
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-black mb-2">Latest Updates</h1>
-            <p className="text-gray-600">Stay informed with the latest visa policy and regulation updates</p>
+            <h1 className="text-4xl font-bold text-black mb-2">{t('updates.title')}</h1>
+            <p className="text-gray-600">{t('updates.subtitle')}</p>
             
             {/* Filters */}
             <div className="flex flex-wrap gap-4 mt-6">
@@ -43,7 +45,7 @@ export function Updates() {
                   onChange={(e) => setSelectedCountry(e.target.value ? e.target.value as Country : undefined)}
                   className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
                 >
-                  <option value="">All Countries</option>
+                  <option value="">{t('updates.allCountries')}</option>
                   <option value={Country.US}>United States</option>
                   <option value={Country.CANADA}>Canada</option>
                   <option value={Country.UK}>United Kingdom</option>
@@ -55,7 +57,7 @@ export function Updates() {
                 onChange={(e) => setSelectedCategory(e.target.value ? e.target.value as NewsCategory : undefined)}
                 className="px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
-                <option value="">All Categories</option>
+                <option value="">{t('updates.allCategories')}</option>
                 <option value={NewsCategory.IMMIGRATION_POLICY}>Immigration Policy</option>
                 <option value={NewsCategory.STUDENT_VISAS}>Student Visas</option>
                 <option value={NewsCategory.WORK_VISAS}>Work Visas</option>
@@ -80,7 +82,7 @@ export function Updates() {
               </div>
             ) : !featuredArticle ? (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-                <p className="text-gray-600">No news articles found</p>
+                <p className="text-gray-600">{t('updates.noNews')}</p>
               </div>
             ) : (
               <>
@@ -157,15 +159,17 @@ export function Updates() {
                   <div className="space-y-4">
                     <h3 className="text-2xl font-bold text-black mb-4">More Updates</h3>
                     {otherArticles.map((article, index) => (
-                      <motion.article
+                      <motion.div
                         key={index}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.1 * index }}
-                        className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                        onClick={() => window.open(article.url, '_blank')}
                       >
-                        <div className="flex gap-4 p-4">
+                        <div 
+                          className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                          onClick={() => window.open(article.url, '_blank')}
+                        >
+                          <div className="flex gap-4 p-4">
                           {article.urlToImage && (
                             <div className="w-32 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
                               <img
@@ -196,8 +200,9 @@ export function Updates() {
                               </p>
                             )}
                           </div>
+                          </div>
                         </div>
-                      </motion.article>
+                      </motion.div>
                     ))}
                   </div>
                 )}

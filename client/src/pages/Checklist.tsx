@@ -18,6 +18,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface ChecklistItem {
   id: string;
@@ -181,20 +182,21 @@ function ChecklistHeader({ progress, completedItems, totalItems }: {
   completedItems: number; 
   totalItems: number; 
 }) {
+  const { t } = useTranslation();
   return (
     <div className="text-center mb-8">
       <h1 className="text-4xl font-bold text-gray-800 mb-2">
-        Visa Document Checklist
+        {t('checklist.title')}
       </h1>
       <p className="text-gray-600 mb-6">
-        Track your visa application readiness step-by-step
+        {t('checklist.subtitle')}
       </p>
       
       <div className="max-w-md mx-auto">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">Progress</span>
+          <span className="text-sm font-medium text-gray-700">{t('checklist.progress')}</span>
           <span className="text-sm font-bold text-green-600">
-            {Math.round(progress)}% Complete
+            {Math.round(progress)}% {t('checklist.completed')}
           </span>
         </div>
         
@@ -299,11 +301,12 @@ function VisaTypeSelector({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const currentType = visaTypes.find(type => type.id === selectedType);
+  const { t } = useTranslation();
   
   return (
     <div className="relative mb-6">
       <label className="block text-sm font-medium text-gray-700 mb-2">
-        Select Visa Type
+        {t('checklist.selectVisa')}
       </label>
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -387,6 +390,7 @@ function ActionButtons({
   onMarkAllComplete: () => void; 
   allCompleted: boolean; 
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col sm:flex-row gap-4 mt-8">
       <Button
@@ -394,7 +398,7 @@ function ActionButtons({
         className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-full py-3 px-6 font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
       >
         <Download className="w-5 h-5 mr-2" />
-        Download Checklist
+        {t('checklist.downloadChecklist')}
       </Button>
       
       <Button
@@ -404,7 +408,7 @@ function ActionButtons({
         className="flex-1 border-green-600 text-green-600 hover:bg-green-50 rounded-full py-3 px-6 font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-50"
       >
         <CheckSquare className="w-5 h-5 mr-2" />
-        {allCompleted ? 'All Complete!' : 'Mark All Complete'}
+        {allCompleted ? t('checklist.completed') : t('checklist.resetProgress')}
       </Button>
     </div>
   );

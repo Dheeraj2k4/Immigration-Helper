@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Footer } from '@/components/Footer';
 import { Send, Bot, User } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Message {
   id: string;
@@ -11,6 +12,7 @@ interface Message {
 
 // Chat Header Component
 function ChatHeader() {
+  const { t } = useTranslation();
   return (
     <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-6 rounded-t-2xl">
       <div className="flex items-center gap-4">
@@ -18,8 +20,8 @@ function ChatHeader() {
           <Bot className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Ask WanderBot</h2>
-          <p className="text-gray-600 text-sm">Your AI Travel Guide — Here to help you explore visas, tours, and destinations.</p>
+          <h2 className="text-2xl font-bold text-gray-800">{t('visaGuide.title')}</h2>
+          <p className="text-gray-600 text-sm">{t('visaGuide.subtitle')}</p>
         </div>
       </div>
     </div>
@@ -28,17 +30,18 @@ function ChatHeader() {
 
 // Suggested Questions Component
 function SuggestedQuestions({ onSelectQuestion }: { onSelectQuestion: (question: string) => void }) {
+  const { t } = useTranslation();
   const suggestions = [
-    "How do I apply for a tourist visa?",
-    "What documents are needed for Australia?",
-    "Show me popular travel destinations.",
-    "Tell me about student visas.",
-    "How long does visa approval take?"
+    "What documents do I need for an F1 student visa?",
+    "How do I apply for an H1B visa?",
+    "What is the passport application process?",
+    "What are the eligibility requirements for F1 visa?",
+    "How long does H1B processing take?"
   ];
 
   return (
     <div className="p-6 border-b border-gray-100">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">Quick questions to get you started:</h3>
+      <h3 className="text-sm font-medium text-gray-700 mb-3">{t('visaGuide.quickQuestions')}</h3>
       <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
         {suggestions.map((suggestion, index) => (
           <button
@@ -125,6 +128,7 @@ function ChatMessages({ messages, isTyping }: { messages: Message[]; isTyping: b
 // Chat Input Component
 function ChatInput({ onSendMessage, disabled }: { onSendMessage: (message: string) => void; disabled: boolean }) {
   const [message, setMessage] = useState('');
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,7 +153,7 @@ function ChatInput({ onSendMessage, disabled }: { onSendMessage: (message: strin
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your question here..."
+          placeholder={t('visaGuide.typePlaceholder')}
           disabled={disabled}
           className="flex-1 px-4 py-3 bg-white border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
         />
@@ -157,6 +161,7 @@ function ChatInput({ onSendMessage, disabled }: { onSendMessage: (message: strin
           type="submit"
           disabled={disabled || !message.trim()}
           className="w-12 h-12 bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-full flex items-center justify-center transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+          aria-label={t('visaGuide.send')}
         >
           <Send className="w-5 h-5" />
         </button>
@@ -170,34 +175,45 @@ export function VisaGuide() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hi there 👋, I'm WanderBot! How can I help you today?",
+      text: "Hi there 👋, I'm your Immigration Assistant powered by AI! I can help you with visa applications, document requirements, and immigration processes for F1 student visas, H1B work visas, and passport applications. How can I help you today?",
       isBot: true,
       timestamp: new Date()
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
 
-  // Simulate bot responses
-  const generateBotResponse = (userMessage: string): string => {
-    const responses: Record<string, string> = {
-      'tourist visa': "For tourist visas, you'll typically need a passport, photos, proof of accommodation, return tickets, and bank statements. The specific requirements vary by destination. Which country are you planning to visit?",
-      'australia': "For Australia, you'll need a valid passport, visa application form, passport photos, proof of funds, health insurance, and character documents. Processing time is usually 15-30 days. Would you like specific details about any of these requirements?",
-      'travel destinations': "Here are some popular destinations: 🇹🇭 Thailand (visa on arrival), 🇯🇵 Japan (e-visa), 🇸🇬 Singapore (visa-free for many), 🇦🇪 UAE (visa on arrival), 🇲🇾 Malaysia (visa-free). Which region interests you most?",
-      'student visa': "Student visas require admission to an accredited institution, financial proof, health insurance, and academic transcripts. Processing can take 2-8 weeks depending on the country. Which country are you considering for studies?",
-      'visa approval': "Visa approval times vary: Tourist visas (5-15 days), Student visas (2-8 weeks), Work visas (4-12 weeks), Family visas (6-18 months). Factors affecting timing include completeness of application, country policies, and current processing volumes."
-    };
+  // Call the RAG API through the backend
+  const generateBotResponse = async (userMessage: string): Promise<string> => {
+    try {
+      const response = await fetch('http://localhost:5000/api/visa-chat/query', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: userMessage,
+          session_id: 'web-session-' + Date.now()
+        }),
+      });
 
-    const lowerMessage = userMessage.toLowerCase();
-    for (const [key, response] of Object.entries(responses)) {
-      if (lowerMessage.includes(key)) {
-        return response;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    }
 
-    return "That's a great question! I can help you with visa applications, document requirements, processing times, and travel destinations. Could you be more specific about what you'd like to know?";
+      const data = await response.json();
+      
+      if (data.success && data.data && data.data.answer) {
+        return data.data.answer;
+      } else {
+        return "I apologize, but I'm having trouble processing your question right now. Please try rephrasing or ask about visa types, document requirements, or application processes.";
+      }
+    } catch (error) {
+      console.error('Error querying RAG service:', error);
+      return "I'm sorry, but I'm having trouble connecting to my knowledge base right now. Please make sure the backend server is running and try again.";
+    }
   };
 
-  const handleSendMessage = (messageText: string) => {
+  const handleSendMessage = async (messageText: string) => {
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -209,18 +225,30 @@ export function VisaGuide() {
     setMessages(prev => [...prev, userMessage]);
     setIsTyping(true);
 
-    // Simulate bot typing and response
-    setTimeout(() => {
+    try {
+      // Get response from RAG API
+      const botText = await generateBotResponse(messageText);
+      
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: generateBotResponse(messageText),
+        text: botText,
         isBot: true,
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      console.error('Error in handleSendMessage:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "I apologize, but something went wrong. Please try again.",
+        isBot: true,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500 + Math.random() * 1000); // Random delay between 1.5-2.5 seconds
+    }
   };
 
   const handleSelectQuestion = (question: string) => {

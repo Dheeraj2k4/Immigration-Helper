@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, FileText, MessageSquare, CheckSquare, Users, Globe, Phone, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { ArrowRight, FileText, MessageSquare, CheckSquare, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/Footer';
 import canadaImg from '@/assets/ca.png';
@@ -10,10 +10,11 @@ import usaImg from '@/assets/usa.png';
 import studentVisaImg from '@/assets/stu_visa.jpg';
 import workVisaImg from '@/assets/work_visa.jpg';
 import touristVisaImg from '@/assets/tourist_visa.jpg';
-import sustainableImg from '@/assets/sustainable.png';
+import { useTranslation } from 'react-i18next';
 
 export function Home() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const scrollToNextSection = () => {
     const nextSection = document.querySelector('section:nth-of-type(2)');
@@ -43,9 +44,9 @@ export function Home() {
               transition={{ duration: 0.8 }}
             >
               <h1 className="text-5xl lg:text-7xl font-bold text-white leading-tight mb-8">
-                Visa Made Easy,
+                {t('hero.title')}
                 <br />
-                Dreams Made Possible
+                {t('hero.subtitle')}
               </h1>
               <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
                 <Button 
@@ -54,7 +55,7 @@ export function Home() {
                   className="bg-secondary hover:bg-secondary/90 text-white px-8 py-4 rounded-full text-lg font-semibold group"
                   style={{ backgroundColor: '#83CD20' }}
                 >
-                  Get Started Today
+                  {t('hero.getStarted')}
                   <ChevronDown size={20} className="ml-2 group-hover:animate-bounce" />
                 </Button>
               </div>
@@ -83,8 +84,8 @@ export function Home() {
               <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: '#034833' }}>
                 <FileText className="text-white" size={32} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Visa Guide</h3>
-              <p className="text-gray-600">Comprehensive step-by-step guidance for your visa application process with expert insights.</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('services.visaGuide.title')}</h3>
+              <p className="text-gray-600">{t('services.visaGuide.description')}</p>
             </div>
 
             {/* AI Interview Card */}
@@ -92,8 +93,8 @@ export function Home() {
               <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: '#83CD20' }}>
                 <MessageSquare className="text-white" size={32} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">AI Interview Practice</h3>
-              <p className="text-gray-600">Practice visa interviews with our advanced AI simulator and boost your confidence.</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('services.aiInterview.title')}</h3>
+              <p className="text-gray-600">{t('services.aiInterview.description')}</p>
             </div>
 
             {/* Checklist Card */}
@@ -101,8 +102,8 @@ export function Home() {
               <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: '#034833' }}>
                 <CheckSquare className="text-white" size={32} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Personal Checklist</h3>
-              <p className="text-gray-600">Track your progress with personalized visa checklists tailored to your destination.</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('services.checklist.title')}</h3>
+              <p className="text-gray-600">{t('services.checklist.description')}</p>
             </div>
             </div>
           </motion.div>
@@ -167,9 +168,9 @@ export function Home() {
             {/* Carousel cards */}
             <div className="flex justify-center space-x-6 flex-wrap gap-6">
               {[
-                { title: "Student Visa", desc: "Academic journey guidance", image: studentVisaImg, type: "student" },
-                { title: "Work Visa", desc: "Professional opportunities", image: workVisaImg, type: "work" },
-                { title: "Tourist Visa", desc: "Travel and exploration", image: touristVisaImg, type: "tourist" }
+                { title: t('visaTypes.student.title'), desc: t('visaTypes.student.description'), image: studentVisaImg, type: "student" },
+                { title: t('visaTypes.work.title'), desc: t('visaTypes.work.description'), image: workVisaImg, type: "work" },
+                { title: t('visaTypes.tourist.title'), desc: t('visaTypes.tourist.description'), image: touristVisaImg, type: "tourist" }
               ].map((item, index) => (
                 <div key={index} className="w-80 bg-white rounded-2xl p-6 shadow-lg">
                   <div className="w-full h-48 bg-gray-200 rounded-xl mb-4 overflow-hidden">
@@ -182,7 +183,7 @@ export function Home() {
                     className="bg-secondary hover:bg-secondary/90 text-white rounded-full w-full" 
                     style={{ backgroundColor: '#83CD20' }}
                   >
-                    Apply Now
+                    {t('visaTypes.student.applyNow')}
                     <ArrowRight size={16} className="ml-2" />
                   </Button>
                 </div>

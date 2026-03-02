@@ -1,0 +1,10 @@
+/**
+ * Extended Express types for file uploads
+ */
+
+import { Request } from 'express';
+
+export interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+  files?: Express.Multer.File[] | { [fieldname: string]: Express.Multer.File[] };
+}

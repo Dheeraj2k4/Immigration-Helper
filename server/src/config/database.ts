@@ -1,24 +1,47 @@
-import mongoose from 'mongoose';
+/**
+ * Supabase Database Connection Configuration
+ */
 
-export const connectDatabase = async (): Promise<void> => {
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment variables from root .env file
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+
+let supabase: SupabaseClient | null = null;
+
+export const connectDatabase = async (): Promise<SupabaseClient | null> => {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/immigration-helper';
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.warn('⚠️  Supabase credentials not configured. Interview features will be disabled.');
+      console.warn('   Set SUPABASE_URL and SUPABASE_ANON_KEY in .env to enable interview features.');
+      return null;
+    }
+
+    supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Test connection by attempting a simple query
+    const { error } = await supabase.from('interview_sessions').select('count').limit(1);
     
-    await mongoose.connect(mongoUri);
-    
-    console.log('✅ MongoDB connected successfully');
-    console.log(`📊 Database: ${mongoose.connection.name}`);
-  } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
+    if (error && error.code !== 'PGRST116') { // PGRST116 = table is empty, which is fine
+      throw error;
+    }
+
+    console.log('✅ Supabase connected successfully');
+    console.log(`📊 Project: ${supabaseUrl}`);
+    return supabase;
+  } catch (error: any) {
+    console.error('❌ Supabase connection error:', error.message);
+    console.warn('⚠️  Interview features will be disabled. Chatbot will still work.');
+    return null;
   }
 };
 
-// Handle connection events
-mongoose.connection.on('disconnected', () => {
-  console.log('⚠️ MongoDB disconnected');
-});
+export const getSupabaseClient = (): SupabaseClient | null => {
+  return supabase;
+};
 
-mongoose.connection.on('error', (err) => {
-  console.error('❌ MongoDB error:', err);
-});

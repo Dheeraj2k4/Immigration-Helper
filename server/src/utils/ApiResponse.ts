@@ -1,9 +1,10 @@
 import { Response } from 'express';
 
 export class ApiResponse {
+  // Response object methods (legacy)
   static success(res: Response, data: any, message: string = 'Success', statusCode: number = 200) {
     return res.status(statusCode).json({
-      status: 'success',
+      success: true,
       message,
       data
     });
@@ -11,9 +12,9 @@ export class ApiResponse {
 
   static error(res: Response, message: string = 'Error occurred', statusCode: number = 500, errors?: any) {
     return res.status(statusCode).json({
-      status: 'error',
-      message,
-      ...(errors && { errors })
+      success: false,
+      error: message,
+      ...(errors && { details: errors })
     });
   }
 

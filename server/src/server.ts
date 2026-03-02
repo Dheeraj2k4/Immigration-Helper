@@ -3,12 +3,16 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import path from 'path';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from root .env file
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 import newsRoutes from './routes/newsRoutes';
+import visaChatRoutes from './routes/visaChatRoutes';
+import interviewRoutes from './routes/interviewRoutes';
+import { connectDatabase } from './config/database';
 
 
 const app: Application = express();
@@ -30,26 +34,36 @@ app.get('/api', (_req, res) => {
     message: 'Welcome to Immigration Helper API',
     version: '1.0.0',
     endpoints: {
-      news: '/api/news'
+      news: '/api/news',
+      visaChat: '/api/visa-chat',
+      interview: '/api/interview'
     }
   });
 });
 
-// TODO: Import and use routes here
-// import visaRoutes from './routes/visaRoutes';
-// app.use('/api/visa', visaRoutes);
-
 // News API routes
 app.use('/api/news', newsRoutes);
+
+// Visa Chat RAG routes
+app.use('/api/visa-chat', visaChatRoutes);
+
+// AI Interview Practice routes
+app.use('/api/interview', interviewRoutes);
 
 // Error handling middleware (must be last)
 app.use(notFound);
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+// Connect to Supabase and start server
+connectDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 API URL: http://localhost:${PORT}/api`);
+  });
+}).catch((error: Error) => {
+  console.error('❌ Failed to connect to Supabase:', error);
+  process.exit(1);
 });
 
 export default app;

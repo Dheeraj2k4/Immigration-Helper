@@ -1,0 +1,31 @@
+# Core Dependencies
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+python-dotenv==1.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# RAG & LLM Dependencies
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-ollama>=0.2.0
+
+# Vector Store & Embeddings
+sentence-transformers>=2.3.0
+faiss-cpu==1.13.2
+
+# Document Processing
+pypdf2==3.0.1
+python-docx==1.1.0
+python-multipart==0.0.9
+markdown==3.5.2
+
+# Utilities
+httpx==0.26.0
+tenacity==8.2.3
+
+# Monitoring & Logging
+loguru==0.7.2
+
+# CORS & Auth
+python-jose==3.3.0

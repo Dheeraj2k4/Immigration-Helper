@@ -15,6 +15,7 @@ import {
   Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface Question {
   id: number;
@@ -90,12 +91,13 @@ const interviewQuestions: Question[] = [
 // Progress Bar Component
 function ProgressBar({ current, total, timeLeft }: { current: number; total: number; timeLeft: string }) {
   const progress = (current / total) * 100;
+  const { t } = useTranslation();
   
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-medium text-gray-700">
-          Question {current} of {total}
+          {t('aiInterview.question')} {current} {t('aiInterview.of')} {total}
         </span>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Clock className="w-4 h-4" />

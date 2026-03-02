@@ -1,0 +1,9 @@
+FROM mistral:latest
+
+# Set parameters for GPU usage
+PARAMETER num_gpu 1
+PARAMETER num_thread 8
+
+# Optimize for GPU performance
+PARAMETER num_ctx 4096
+PARAMETER num_batch 512
