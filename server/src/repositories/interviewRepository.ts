@@ -29,6 +29,9 @@ export class InterviewRepository {
     questions: Question[];
   }): Promise<InterviewSession> {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      throw new Error('Database not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.');
+    }
 
     const { data: session, error } = await supabase
       .from('interview_sessions')
@@ -55,6 +58,9 @@ export class InterviewRepository {
    */
   static async findBySessionId(sessionId: string): Promise<InterviewSession | null> {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      throw new Error('Database not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.');
+    }
 
     const { data, error } = await supabase
       .from('interview_sessions')
@@ -75,6 +81,9 @@ export class InterviewRepository {
    */
   static async findActiveSession(sessionId: string): Promise<InterviewSession | null> {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      throw new Error('Database not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.');
+    }
 
     const { data, error } = await supabase
       .from('interview_sessions')
@@ -96,6 +105,9 @@ export class InterviewRepository {
    */
   static async findByUserId(userId: string): Promise<InterviewSession[]> {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      throw new Error('Database not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.');
+    }
 
     const { data, error } = await supabase
       .from('interview_sessions')
@@ -118,6 +130,9 @@ export class InterviewRepository {
     response: InterviewResponse
   ): Promise<InterviewSession> {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      throw new Error('Database not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.');
+    }
 
     // Get current session
     const session = await this.findBySessionId(sessionId);
@@ -155,6 +170,9 @@ export class InterviewRepository {
    */
   static async complete(sessionId: string, summary: string): Promise<InterviewSession> {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      throw new Error('Database not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.');
+    }
 
     const { data, error } = await supabase
       .from('interview_sessions')
@@ -185,6 +203,9 @@ export class InterviewRepository {
    */
   static async delete(sessionId: string): Promise<void> {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+      throw new Error('Database not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY.');
+    }
 
     const { error } = await supabase
       .from('interview_sessions')
