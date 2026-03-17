@@ -1,0 +1,53 @@
+@startuml
+title Immigration Helper - Simplified Architecture
+
+actor User
+
+package "Frontend Layer" {
+  [React App] as Frontend
+  note right of Frontend
+    - Home, Visa Guide, 
+      Checklist, Updates
+    - Multi-language (i18n)
+  end note
+}
+
+package "Backend Layer" {
+  [Node.js/Express\nAPI Server] as NodeAPI
+  [Python/FastAPI\nRAG Service] as RAGService
+}
+
+package "AI Layer" {
+  [Ollama\n(Mistral 7B)] as LLM
+  [ChromaDB +\nFAISS] as VectorDB
+}
+
+database "Data" {
+  folder "Visa Documents\n(Markdown)" as Docs
+  folder "Embeddings" as Embeddings
+}
+
+cloud "External" {
+  [NewsData.io] as NewsAPI
+}
+
+' Main flow
+User --> Frontend : Browse / Ask
+Frontend --> NodeAPI : API Request
+NodeAPI --> RAGService : Chat Query
+NodeAPI --> NewsAPI : Fetch News
+
+' RAG flow
+RAGService --> VectorDB : Search Similar
+RAGService --> LLM : Generate Answer
+RAGService --> Docs : Load Content
+
+' Data flow
+Docs --> Embeddings : Process
+Embeddings --> VectorDB : Store
+
+' Response
+NodeAPI --> Frontend : JSON
+Frontend --> User : Display
+
+@enduml

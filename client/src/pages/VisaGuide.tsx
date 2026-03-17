@@ -93,7 +93,7 @@ function ChatMessages({ messages, isTyping }: { messages: Message[]; isTyping: b
                   : 'bg-green-500 text-white'
               }`}
             >
-              <p className="text-sm leading-relaxed">{message.text}</p>
+              <p className="text-sm leading-relaxed whitespace-pre-line">{message.text}</p>
               <p className={`text-xs mt-1 ${
                 message.isBot ? 'text-gray-500' : 'text-green-100'
               }`}>

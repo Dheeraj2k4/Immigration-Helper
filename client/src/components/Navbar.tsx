@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 const navigationItems = [
   { name: 'nav.home', href: '/', icon: Home },
   { name: 'nav.visaGuide', href: '/visa-guide', icon: FileText },
-  { name: 'nav.aiInterview', href: '/ai-interview', icon: MessageSquare },
+  // { name: 'nav.aiInterview', href: '/ai-interview', icon: MessageSquare },
   { name: 'nav.updates', href: '/updates', icon: Bell },
   { name: 'nav.checklist', href: '/checklist', icon: CreditCard },
 ];

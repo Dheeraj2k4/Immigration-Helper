@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, FileText, MessageSquare, CheckSquare, ChevronDown } from 'lucide-react';
+import { ArrowRight, FileText, MessageSquare, CheckSquare, ChevronDown, Newspaper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/Footer';
 import canadaImg from '@/assets/ca.png';
@@ -88,13 +88,16 @@ export function Home() {
               <p className="text-gray-600">{t('services.visaGuide.description')}</p>
             </div>
 
-            {/* AI Interview Card */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+            {/* Immigration Updates Card */}
+            <div 
+              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+              onClick={() => navigate('/updates')}
+            >
               <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: '#83CD20' }}>
-                <MessageSquare className="text-white" size={32} />
+                <Newspaper className="text-white" size={32} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('services.aiInterview.title')}</h3>
-              <p className="text-gray-600">{t('services.aiInterview.description')}</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">{t('services.updates.title')}</h3>
+              <p className="text-gray-600">{t('services.updates.description')}</p>
             </div>
 
             {/* Checklist Card */}

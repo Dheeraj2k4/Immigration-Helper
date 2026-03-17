@@ -20,7 +20,8 @@ class GeminiService {
         );
       }
       this.genAI = new GoogleGenerativeAI(apiKey);
-      this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+      // Use gemini-3-flash-preview (latest working model as of 2026)
+      this.model = this.genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
     }
   }
 

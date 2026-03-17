@@ -44,9 +44,9 @@ class Settings(BaseSettings):
     # RAG Configuration
     chunk_size: int = Field(default=1000, alias="CHUNK_SIZE")
     chunk_overlap: int = Field(default=200, alias="CHUNK_OVERLAP")
-    top_k_results: int = Field(default=5, alias="TOP_K_RESULTS")
-    temperature: float = Field(default=0.7, alias="TEMPERATURE")
-    max_tokens: int = Field(default=2000, alias="MAX_TOKENS")
+    top_k_results: int = Field(default=3, alias="TOP_K_RESULTS")  # Reduced for faster responses
+    temperature: float = Field(default=0.5, alias="TEMPERATURE")  # Lower for faster, focused answers
+    max_tokens: int = Field(default=500, alias="MAX_TOKENS")  # Reduced for shorter responses
     
     # CORS Configuration
     cors_origins: str = Field(

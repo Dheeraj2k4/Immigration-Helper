@@ -1,0 +1,84 @@
+@startuml
+title Immigration Helper - Deployment Diagram
+
+node "User Device" {
+  component [Web Browser] as Browser
+  artifact "React App\n(Vite + TypeScript)" as ReactApp
+  Browser --> ReactApp
+}
+
+node "Backend Server" {
+  node "Node.js Runtime" {
+    component [Express API Server] as NodeAPI
+    artifact "server.ts" as ServerCode
+    NodeAPI --> ServerCode
+  }
+  
+  node "Python Runtime" {
+    component [FastAPI Server] as RAGServer
+    artifact "main.py" as RAGCode
+    RAGServer --> RAGCode
+  }
+}
+
+node "AI/ML Server" {
+  component [Ollama Service] as Ollama
+  artifact "Mistral 7B LLM" as LLM
+  Ollama --> LLM
+}
+
+database "Vector Database" {
+  component [ChromaDB] as ChromaDB
+  component [FAISS Index] as FAISS
+  ChromaDB -- FAISS
+}
+
+database "Document Storage" {
+  folder "Visa Documents" as Docs {
+    artifact "*.md files" as MarkdownDocs
+  }
+}
+
+cloud "External Services" {
+  component [NewsData.io API] as NewsAPI
+}
+
+' Connections
+Browser -down-> NodeAPI : HTTPS/REST
+NodeAPI -down-> RAGServer : HTTP/8000
+NodeAPI -down-> NewsAPI : HTTPS API Calls
+RAGServer -down-> Ollama : HTTP/11434
+RAGServer -down-> ChromaDB : Query Embeddings
+RAGServer -down-> Docs : Load Documents
+
+note right of ReactApp
+  Port: 5173 (dev)
+  Framework: React 18
+  Build: Vite
+end note
+
+note right of NodeAPI
+  Port: 5000
+  Framework: Express
+  Language: TypeScript
+end note
+
+note right of RAGServer
+  Port: 8000
+  Framework: FastAPI
+  Language: Python
+end note
+
+note right of Ollama
+  Port: 11434
+  Model: Mistral 7B
+  GPU Support: CUDA
+end note
+
+note bottom of ChromaDB
+  Vector Store with
+  FAISS indexing for
+  fast similarity search
+end note
+
+@enduml

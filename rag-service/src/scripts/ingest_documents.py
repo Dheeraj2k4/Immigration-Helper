@@ -5,8 +5,8 @@ Run this after adding new documents to the data/documents directory.
 import sys
 from pathlib import Path
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add parent directory to path so imports work
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from loguru import logger
 from src.core import DocumentLoader, VectorStoreManager

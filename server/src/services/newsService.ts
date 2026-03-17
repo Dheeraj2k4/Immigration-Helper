@@ -29,7 +29,8 @@ export const newsService = {
       } = options;
 
       // Simpler search query for immigration-related articles (NewsData.io has limits on query complexity)
-      const searchQuery = 'visa immigration student work passport';
+      // Using OR logic with fewer keywords for better results
+      const searchQuery = 'visa OR immigration OR passport';
 
       const response = await axios.get<NewsApiResponse>(
         `${NEWS_API_BASE_URL}/news`,
@@ -38,7 +39,8 @@ export const newsService = {
             apikey: NEWS_API_KEY,
             q: searchQuery,
             language: 'en',
-            size: Math.min(pageSize, 50)
+            size: Math.min(pageSize, 50),
+            category: 'politics,domestic' // Add categories to get more results
             // Note: page parameter only used with nextPage token from previous response
           }
         }
@@ -48,6 +50,8 @@ export const newsService = {
         status: response.data.status,
         resultsCount: response.data.results?.length || 0,
         hasResults: !!response.data.results,
+        totalResults: response.data.totalResults,
+        nextPage: response.data.nextPage,
         fullResponse: JSON.stringify(response.data).substring(0, 500)
       });
 
@@ -57,7 +61,11 @@ export const newsService = {
       }
 
       if (!response.data.results || response.data.results.length === 0) {
-        console.warn('No results returned from API');
+        console.warn('⚠️ No results from NewsData API. Possible reasons:');
+        console.warn('  1. Free tier daily limit reached (200 requests/day)');
+        console.warn('  2. No articles matching query in last 48 hours');
+        console.warn('  3. Query too restrictive');
+        console.warn('  Check: https://newsdata.io/dashboard for API usage');
         return [];
       }
 
@@ -111,8 +119,8 @@ export const newsService = {
         category
       } = options;
 
-      // Simpler combined search query
-      const query = `${searchTerm} visa immigration`;
+      // Simpler combined search query with OR logic
+      const query = `${searchTerm} OR visa OR immigration`;
 
       const response = await axios.get<NewsApiResponse>(
         `${NEWS_API_BASE_URL}/news`,
@@ -121,7 +129,8 @@ export const newsService = {
             apikey: NEWS_API_KEY,
             q: query,
             language: 'en',
-            size: Math.min(pageSize, 50)
+            size: Math.min(pageSize, 50),
+            category: 'politics,domestic'
             // Note: page parameter only used with nextPage token from previous response
           }
         }
@@ -166,9 +175,10 @@ export const newsService = {
         {
           params: {
             apikey: NEWS_API_KEY,
-            q: 'visa immigration student work passport',
+            q: 'visa OR immigration OR passport',
             language: 'en',
-            size: Math.min(pageSize, 50)
+            size: Math.min(pageSize, 50),
+            category: 'politics,domestic'
           }
         }
       );

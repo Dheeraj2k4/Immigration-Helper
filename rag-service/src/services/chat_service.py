@@ -32,6 +32,15 @@ class ChatService:
         logger.info(f"Processing chat query (session: {request.session_id})")
         
         try:
+            # Quick response for greetings
+            if self._is_greeting(request.query):
+                return ChatQueryResponse(
+                    answer="Hi there! 👋 I'm here to help with your visa and immigration questions. What would you like to know?",
+                    sources=[],
+                    session_id=request.session_id,
+                    confidence=1.0
+                )
+            
             # Check if RAG service is ready
             if not self.rag_service.is_ready():
                 logger.warning("RAG service not ready - no documents loaded")
@@ -66,6 +75,25 @@ class ChatService:
                 session_id=request.session_id,
                 confidence=0.0
             )
+    
+    def _is_greeting(self, query: str) -> bool:
+        """
+        Check if the query is a simple greeting.
+        
+        Args:
+            query: User's query
+            
+        Returns:
+            True if query is a greeting
+        """
+        greeting_words = ['hello', 'hi', 'hey', 'greetings', 'good morning', 'good afternoon', 'good evening']
+        query_lower = query.lower().strip()
+        
+        # Check if query is just a greeting (short message with greeting words)
+        if len(query_lower.split()) <= 3:
+            return any(greeting in query_lower for greeting in greeting_words)
+        
+        return False
     
     def _calculate_confidence(self, sources) -> Optional[float]:
         """

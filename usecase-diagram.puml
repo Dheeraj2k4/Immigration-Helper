@@ -1,0 +1,77 @@
+@startuml
+skinparam actorStyle awesome
+left to right direction
+title Immigration Helper - Use Case Diagram
+
+:User: as User
+
+rectangle "Immigration Helper System" {
+  
+  together {
+    (Ask Visa Questions) as AskQuestions
+  }
+  
+  together {
+    (Enter Question) as EnterQ
+    (Get AI Response) as GetResponse
+    (View Source Documents) as ViewSources
+  }
+  
+  together {
+    (View Immigration News) as ViewNews
+  }
+  
+  together {
+    (Filter by Country) as FilterCountry
+    (Filter by Category) as FilterCategory
+    (Read Full Article) as ReadArticle
+  }
+  
+  together {
+    (Generate Document Checklist) as GenerateChecklist
+  }
+  
+  together {
+    (Select Visa Type) as SelectVisa
+    (Select Country) as SelectCountry
+    (View Required Documents) as ViewDocs
+  }
+  
+  together {
+    (Browse Visa Guide) as BrowseGuide
+    (Change Language) as ChangeLanguage
+  }
+}
+
+' User connections
+User --> AskQuestions
+User --> ViewNews
+User --> GenerateChecklist
+User --> BrowseGuide
+User --> ChangeLanguage
+
+' Chat flow
+AskQuestions ..> EnterQ : <<include>>
+AskQuestions ..> GetResponse : <<include>>
+AskQuestions ..> ViewSources : <<extend>>
+
+' News flow
+ViewNews ..> ReadArticle : <<include>>
+ViewNews ..> FilterCountry : <<extend>>
+ViewNews ..> FilterCategory : <<extend>>
+
+' Checklist flow
+GenerateChecklist ..> SelectVisa : <<include>>
+GenerateChecklist ..> SelectCountry : <<include>>
+GenerateChecklist ..> ViewDocs : <<include>>
+
+note right of GetResponse
+  Uses RAG with
+  Mistral LLM
+end note
+
+note right of ReadArticle
+  From NewsData.io API
+end note
+
+@enduml
