@@ -24,9 +24,14 @@ function serializeMessages(msgs: Message[]) {
   return JSON.stringify(msgs.map(m => ({ ...m, timestamp: m.timestamp.toISOString() })));
 }
 
+// Module-level callback — notifies whichever component instance is currently mounted
+// when the async handler (possibly from an old unmounted instance) writes to storage.
+let onStorageUpdate: (() => void) | null = null;
+
 function writeToStorage(msgs: Message[]) {
   try {
     sessionStorage.setItem(CHAT_STORAGE_KEY, serializeMessages(msgs));
+    onStorageUpdate?.();
   } catch { /* ignore */ }
 }
 
@@ -97,19 +102,31 @@ function SuggestedQuestions({ onSelectQuestion }: { onSelectQuestion: (question:
 }
 
 // Chat Messages Component
-function ChatMessages({ messages, isTyping }: { messages: Message[]; isTyping: boolean }) {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+function ChatMessages({ messages, isTyping, userMessageCount }: { messages: Message[]; isTyping: boolean; userMessageCount: number }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isNearBottomRef = useRef(true);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // Track whether the user is near the bottom
+  const handleScroll = () => {
+    const el = containerRef.current;
+    if (!el) return;
+    const threshold = 80; // px from bottom
+    isNearBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
   };
 
+  // Always scroll when user sends a message (reset position)
   useEffect(() => {
-    scrollToBottom();
+    isNearBottomRef.current = true;
+  }, [userMessageCount]);
+
+  // Only auto-scroll if the user hasn't scrolled up
+  useEffect(() => {
+    const el = containerRef.current;
+    if (el && isNearBottomRef.current) el.scrollTop = el.scrollHeight;
   }, [messages, isTyping]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-96">
+    <div ref={containerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-6 space-y-4 max-h-96">
       {messages.map((message) => (
         <div
           key={message.id}
@@ -159,7 +176,6 @@ function ChatMessages({ messages, isTyping }: { messages: Message[]; isTyping: b
           </div>
         </div>
       )}
-      <div ref={messagesEndRef} />
     </div>
   );
 }
@@ -218,10 +234,21 @@ export function VisaGuide() {
   const { i18n } = useTranslation();
   const isMountedRef = useRef(true);
   const messagesRef = useRef(messages);
+  const generationRef = useRef(0);          // incremented on reset to invalidate in-flight handlers
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     isMountedRef.current = true;
-    return () => { isMountedRef.current = false; };
+    // Register this instance as the active listener for storage updates
+    // from any in-flight async handler (including one from a previous mount)
+    onStorageUpdate = () => {
+      setMessages(loadMessages());
+      setIsTyping(sessionStorage.getItem(CHAT_PENDING_KEY) === 'true');
+    };
+    return () => {
+      isMountedRef.current = false;
+      onStorageUpdate = null;
+    };
   }, []);
 
   // Keep messagesRef in sync so async handlers always see latest messages
@@ -235,20 +262,28 @@ export function VisaGuide() {
   }, [messages]);
 
   const handleReset = () => {
+    // Abort any in-flight fetch
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
+    // Invalidate any async handlers still waiting on the old generation
+    generationRef.current += 1;
     sessionStorage.removeItem(CHAT_STORAGE_KEY);
     sessionStorage.removeItem(CHAT_PENDING_KEY);
-    setMessages([{ ...defaultWelcomeMessage, timestamp: new Date() }]);
+    const welcome = { ...defaultWelcomeMessage, timestamp: new Date() };
+    setMessages([welcome]);
+    writeToStorage([welcome]);
     setIsTyping(false);
   };
 
   // Call the RAG API through the backend
-  const generateBotResponse = async (userMessage: string): Promise<string> => {
+  const generateBotResponse = async (userMessage: string, signal: AbortSignal): Promise<string> => {
     try {
       const response = await fetch('http://localhost:5000/api/visa-chat/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        signal,
         body: JSON.stringify({
           query: userMessage,
           session_id: 'web-session-' + Date.now(),
@@ -269,11 +304,16 @@ export function VisaGuide() {
       }
     } catch (error) {
       console.error('Error querying RAG service:', error);
+      if ((error as Error).name === 'AbortError') throw error; // propagate abort
       return "I'm sorry, but I'm having trouble connecting to my knowledge base right now. Please make sure the backend server is running and try again.";
     }
   };
 
   const handleSendMessage = async (messageText: string) => {
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    const generation = generationRef.current;
+
     const userMessage: Message = {
       id: Date.now().toString(),
       text: messageText,
@@ -290,7 +330,10 @@ export function VisaGuide() {
     sessionStorage.setItem(CHAT_PENDING_KEY, 'true');
 
     try {
-      const botText = await generateBotResponse(messageText);
+      const botText = await generateBotResponse(messageText, controller.signal);
+
+      // If reset was called while waiting, discard this result
+      if (generation !== generationRef.current) return;
 
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -310,6 +353,11 @@ export function VisaGuide() {
         setIsTyping(false);
       }
     } catch (error) {
+      // Silently discard aborted requests (reset was pressed)
+      if ((error as Error).name === 'AbortError') return;
+
+      if (generation !== generationRef.current) return;
+
       console.error('Error in handleSendMessage:', error);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -348,7 +396,7 @@ export function VisaGuide() {
           <div className="bg-white rounded-2xl shadow-xl border border-green-100 overflow-hidden">
             <ChatHeader onReset={handleReset} />
             <SuggestedQuestions onSelectQuestion={handleSelectQuestion} />
-            <ChatMessages messages={messages} isTyping={isTyping} />
+            <ChatMessages messages={messages} isTyping={isTyping} userMessageCount={messages.filter(m => !m.isBot).length} />
             <ChatInput onSendMessage={handleSendMessage} disabled={isTyping} />
           </div>
         </div>
