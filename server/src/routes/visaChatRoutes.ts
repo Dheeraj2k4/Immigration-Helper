@@ -13,7 +13,7 @@ const RAG_SERVICE_URL = process.env.RAG_SERVICE_URL || 'http://localhost:8000';
  */
 router.post('/query', async (req: Request, res: Response) => {
   try {
-    const { query, session_id } = req.body;
+    const { query, session_id, language } = req.body;
 
     // Validate input
     if (!query || typeof query !== 'string' || query.trim().length === 0) {
@@ -30,15 +30,20 @@ router.post('/query', async (req: Request, res: Response) => {
       });
     }
 
+    // Validate language (allow only known codes, fallback to 'en')
+    const allowedLanguages = ['en', 'es', 'hi', 'te'];
+    const resolvedLanguage = allowedLanguages.includes(language) ? language : 'en';
+
     // Forward request to RAG service
     const response = await axios.post(
       `${RAG_SERVICE_URL}/api/v1/chat/query`,
       {
         query: query.trim(),
         session_id: session_id || undefined,
+        language: resolvedLanguage,
       },
       {
-        timeout: 30000, // 30 second timeout
+        timeout: 120000, // 120 second timeout (Ollama LLM can be slow)
         headers: {
           'Content-Type': 'application/json',
         },

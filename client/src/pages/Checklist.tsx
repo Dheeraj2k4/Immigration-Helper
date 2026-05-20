@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Footer } from '@/components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,7 +15,10 @@ import {
   Download,
   CheckSquare,
   Info,
-  ChevronDown
+  ChevronDown,
+  Upload,
+  ExternalLink,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +29,7 @@ interface ChecklistItem {
   description: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
   isChecked: boolean;
+  uploadedFile?: { name: string; url: string };
 }
 
 interface VisaType {
@@ -225,12 +229,17 @@ function ChecklistHeader({ progress, completedItems, totalItems }: {
 // Checklist Item Component
 function ChecklistItem({ 
   item, 
-  onToggle 
+  onToggle,
+  onFileUpload,
+  onFileRemove
 }: { 
   item: ChecklistItem; 
-  onToggle: (id: string) => void; 
+  onToggle: (id: string) => void;
+  onFileUpload: (id: string, file: File) => void;
+  onFileRemove: (id: string) => void;
 }) {
   const Icon = item.icon;
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   return (
     <motion.div
@@ -274,8 +283,51 @@ function ChecklistItem({
           }`}>
             {item.description}
           </p>
+          {/* File upload */}
+          <div className="mt-2">
+            {item.uploadedFile ? (
+              <div className="flex items-center gap-2">
+                <a
+                  href={item.uploadedFile.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs text-green-700 hover:text-green-800 bg-green-100 hover:bg-green-200 px-2.5 py-1 rounded-full transition-colors"
+                  title={item.uploadedFile.name}
+                >
+                  <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                  <span className="max-w-[160px] truncate">{item.uploadedFile.name}</span>
+                </a>
+                <button
+                  onClick={() => onFileRemove(item.id)}
+                  className="text-gray-400 hover:text-red-500 transition-colors"
+                  title="Remove file"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-600 border border-dashed border-gray-300 hover:border-green-400 px-3 py-1 rounded-full transition-colors"
+              >
+                <Upload className="w-3 h-3" />
+                Upload document
+              </button>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onFileUpload(item.id, file);
+                e.target.value = '';
+              }}
+            />
+          </div>
         </div>
-        
+
         {item.isChecked && (
           <div className="flex-shrink-0 mt-1">
             <motion.div
@@ -420,14 +472,17 @@ export function Checklist() {
   const initialVisaType = (location.state as { visaType?: string })?.visaType || 'tourist';
   const [selectedVisaType, setSelectedVisaType] = useState(initialVisaType);
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+  const objectUrlsRef = useRef<Map<string, string>>(new Map());
 
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Initialize checklist items when visa type changes
+  // Initialize checklist items when visa type changes and revoke old object URLs
   useEffect(() => {
+    objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    objectUrlsRef.current.clear();
     const visaType = visaTypes.find(type => type.id === selectedVisaType);
     if (visaType) {
       setChecklistItems(
@@ -440,6 +495,28 @@ export function Checklist() {
     setChecklistItems(prev =>
       prev.map(item =>
         item.id === id ? { ...item, isChecked: !item.isChecked } : item
+      )
+    );
+  };
+
+  const handleFileUpload = (id: string, file: File) => {
+    const existing = objectUrlsRef.current.get(id);
+    if (existing) URL.revokeObjectURL(existing);
+    const url = URL.createObjectURL(file);
+    objectUrlsRef.current.set(id, url);
+    setChecklistItems(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, uploadedFile: { name: file.name, url } } : item
+      )
+    );
+  };
+
+  const handleFileRemove = (id: string) => {
+    const url = objectUrlsRef.current.get(id);
+    if (url) { URL.revokeObjectURL(url); objectUrlsRef.current.delete(id); }
+    setChecklistItems(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, uploadedFile: undefined } : item
       )
     );
   };
@@ -508,6 +585,8 @@ export function Checklist() {
                   key={item.id}
                   item={item}
                   onToggle={toggleItem}
+                  onFileUpload={handleFileUpload}
+                  onFileRemove={handleFileRemove}
                 />
               ))}
               </div>

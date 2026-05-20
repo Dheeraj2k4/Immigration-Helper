@@ -22,10 +22,16 @@ class Settings(BaseSettings):
         default="development", alias="API_ENV"
     )
     
-    # LLM Configuration - Using Ollama only
+    # LLM Configuration
+    llm_provider: Literal["ollama", "groq"] = Field(default="ollama", alias="LLM_PROVIDER")
+
     # Ollama Configuration (runs locally with GPU support)
     ollama_base_url: str = Field(default="http://localhost:11434", alias="OLLAMA_BASE_URL")
-    ollama_model: str = Field(default="mistral", alias="OLLAMA_MODEL")
+    ollama_model: str = Field(default="mistral-gpu", alias="OLLAMA_MODEL")
+
+    # Groq Configuration (cloud, ~1-3s responses, free tier)
+    groq_api_key: str = Field(default="", alias="GROQ_API_KEY")
+    groq_model: str = Field(default="llama-3.1-8b-instant", alias="GROQ_MODEL")
     
     # Embedding Configuration (HuggingFace only)
     huggingface_embedding_model: str = Field(

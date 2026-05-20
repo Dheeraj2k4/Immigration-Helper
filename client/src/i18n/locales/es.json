@@ -2,57 +2,56 @@
   "nav": {
     "home": "Inicio",
     "visaGuide": "Guía de Visa",
-    "aiInterview": "Entrevista IA",
     "updates": "Actualizaciones",
-    "checklist": "Lista de Verificación",
-    "loginSignup": "Iniciar Sesión / Registrarse"
+    "checklist": "Lista de verificación",
+    "loginSignup": "Iniciar sesión / Registrarse"
   },
   "hero": {
-    "title": "Visa Fácil,",
-    "subtitle": "Sueños Posibles",
-    "getStarted": "Comience Hoy"
+    "title": "La visa simplificada,",
+    "subtitle": "los sueños hechos realidad",
+    "getStarted": "Comenzar hoy"
   },
   "services": {
     "visaGuide": {
       "title": "Guía de Visa",
-      "description": "Orientación completa paso a paso para su proceso de solicitud de visa con conocimientos de expertos."
+      "description": "Orientación completa paso a paso para su proceso de solicitud de visa con asesoramiento experto."
     },
     "updates": {
-      "title": "Últimas Actualizaciones",
+      "title": "Últimas actualizaciones",
       "description": "Manténgase informado con las últimas noticias de inmigración, cambios de políticas y actualizaciones de visa en todo el mundo."
     },
     "checklist": {
-      "title": "Lista de Documentos",
-      "description": "Nunca pierda un documento con nuestra lista de verificación personalizada adaptada a su tipo de visa."
+      "title": "Lista de documentos",
+      "description": "Nunca pierda un documento con listas de verificación personalizadas adaptadas a su tipo de visa."
     }
   },
   "visaTypes": {
-    "title": "Tipos de Visa Populares",
-    "description": "Elija el tipo de visa que se adapte a su propósito y obtenga orientación personalizada.",
+    "title": "Tipos de visa populares",
+    "description": "Elija el tipo de visa que se adapte a su propósito y reciba orientación personalizada.",
     "student": {
-      "title": "Visa de Estudiante",
-      "description": "Todo lo que necesita para su viaje educativo al extranjero.",
-      "applyNow": "Aplicar Ahora"
+      "title": "Visa de estudiante",
+      "description": "Todo lo que necesita para su viaje educativo en el extranjero.",
+      "applyNow": "Solicitar ahora"
     },
     "work": {
-      "title": "Visa de Trabajo",
-      "description": "Oportunidades profesionales le esperan - permítanos ayudarle a llegar allí.",
-      "applyNow": "Aplicar Ahora"
+      "title": "Visa de trabajo",
+      "description": "Oportunidades profesionales te esperan — déjanos ayudarte a llegar.",
+      "applyNow": "Solicitar ahora"
     },
     "tourist": {
-      "title": "Visa de Turista",
-      "description": "Explore el mundo sin complicaciones con la documentación adecuada.",
-      "applyNow": "Aplicar Ahora"
+      "title": "Visa de turista",
+      "description": "Explore el mundo sin preocupaciones con la documentación adecuada.",
+      "applyNow": "Solicitar ahora"
     }
   },
   "countries": {
-    "title": "Países Que Cubrimos",
-    "description": "Orientación experta para solicitudes de visa a destinos populares en todo el mundo."
+    "title": "Países que cubrimos",
+    "description": "Orientación experta sobre solicitudes de visa para los destinos más populares del mundo."
   },
   "whyChooseUs": {
-    "title": "¿Por Qué Elegir RouteX?",
+    "title": "¿Por qué elegir RouteX?",
     "professional": {
-      "title": "Equipo Profesional",
+      "title": "Equipo profesional",
       "description": "Asesores expertos con años de experiencia en inmigración"
     },
     "support": {
@@ -60,60 +59,48 @@
       "description": "Asistencia las 24 horas para todas sus consultas"
     },
     "success": {
-      "title": "Alta Tasa de Éxito",
+      "title": "Alta tasa de éxito",
       "description": "Historial comprobado de solicitudes de visa exitosas"
     }
   },
   "cta": {
-    "title": "¿Listo Para Comenzar Su Viaje?",
-    "description": "Únase a miles que han obtenido exitosamente sus visas con RouteX.",
-    "button": "Comience Ahora"
+    "title": "¿Listo para comenzar tu viaje?",
+    "description": "Únase a miles de personas que han obtenido exitosamente sus visas con RouteX.",
+    "button": "Comenzar ahora"
   },
   "footer": {
     "description": "Su socio de confianza para solicitudes de visa y orientación de inmigración en todo el mundo.",
-    "quickLinks": "Enlaces Rápidos",
+    "quickLinks": "Enlaces rápidos",
     "support": "Soporte",
-    "faq": "Preguntas Frecuentes",
+    "faq": "Preguntas frecuentes",
     "contact": "Contáctenos",
-    "privacy": "Política de Privacidad",
-    "terms": "Términos de Servicio",
+    "privacy": "Política de privacidad",
+    "terms": "Términos de servicio",
     "allRightsReserved": "Todos los derechos reservados."
   },
   "visaGuide": {
     "title": "Pregunta a WanderBot",
-    "subtitle": "Tu Guía de Viajes IA — Aquí para ayudarte a explorar visas, tours y destinos.",
+    "subtitle": "Tu guía de viaje con IA — aquí para ayudarte con visas, tours y destinos.",
     "quickQuestions": "Preguntas rápidas para comenzar:",
     "typePlaceholder": "Escribe tu mensaje aquí...",
     "send": "Enviar"
   },
-  "aiInterview": {
-    "title": "Práctica de Entrevista IA",
-    "subtitle": "Practica tus habilidades de entrevista con nuestro simulador impulsado por IA",
-    "startInterview": "Iniciar Entrevista",
-    "question": "Pregunta",
-    "of": "de",
-    "timeRemaining": "Tiempo Restante",
-    "tips": "Consejos",
-    "nextQuestion": "Siguiente Pregunta",
-    "previousQuestion": "Anterior",
-    "finishInterview": "Finalizar Entrevista"
-  },
   "updates": {
-    "title": "Últimas Actualizaciones",
+    "title": "Últimas actualizaciones",
     "subtitle": "Manténgase informado con las últimas actualizaciones de políticas y regulaciones de visa",
-    "allCountries": "Todos los Países",
-    "allCategories": "Todas las Categorías",
+    "allCountries": "Todos los países",
+    "allCategories": "Todas las categorías",
     "featured": "Destacado",
-    "readMore": "Leer Más",
+    "readMore": "Leer más",
     "noNews": "No se encontraron artículos de noticias"
   },
   "checklist": {
-    "title": "Lista de Documentos de Visa",
-    "subtitle": "Rastree sus documentos de solicitud de visa",
-    "selectVisa": "Seleccionar Tipo de Visa",
+    "title": "Lista de documentos de visa",
+    "subtitle": "Realice un seguimiento de los documentos de su solicitud de visa",
+    "selectVisa": "Seleccionar tipo de visa",
     "progress": "Progreso",
     "completed": "Completado",
-    "downloadChecklist": "Descargar Lista",
-    "resetProgress": "Restablecer Progreso"
+    "downloadChecklist": "Descargar lista de verificación",
+    "resetProgress": "Restablecer progreso"
   }
 }

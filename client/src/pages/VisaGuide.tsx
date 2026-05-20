@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Footer } from '@/components/Footer';
-import { Send, Bot, User } from 'lucide-react';
+import { Send, Bot, User, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface Message {
@@ -10,8 +10,39 @@ interface Message {
   timestamp: Date;
 }
 
+const CHAT_STORAGE_KEY = 'visa-guide-chat';
+const CHAT_PENDING_KEY = 'visa-guide-pending';
+
+const defaultWelcomeMessage: Message = {
+  id: '1',
+  text: "Hi there 👋, I'm your Immigration Assistant powered by AI! I can help you with visa applications, document requirements, and immigration processes for F1 student visas, H1B work visas, and passport applications. How can I help you today?",
+  isBot: true,
+  timestamp: new Date(),
+};
+
+function serializeMessages(msgs: Message[]) {
+  return JSON.stringify(msgs.map(m => ({ ...m, timestamp: m.timestamp.toISOString() })));
+}
+
+function writeToStorage(msgs: Message[]) {
+  try {
+    sessionStorage.setItem(CHAT_STORAGE_KEY, serializeMessages(msgs));
+  } catch { /* ignore */ }
+}
+
+function loadMessages(): Message[] {
+  try {
+    const stored = sessionStorage.getItem(CHAT_STORAGE_KEY);
+    if (!stored) return [defaultWelcomeMessage];
+    const parsed: Array<Omit<Message, 'timestamp'> & { timestamp: string }> = JSON.parse(stored);
+    return parsed.map(m => ({ ...m, timestamp: new Date(m.timestamp) }));
+  } catch {
+    return [defaultWelcomeMessage];
+  }
+}
+
 // Chat Header Component
-function ChatHeader() {
+function ChatHeader({ onReset }: { onReset: () => void }) {
   const { t } = useTranslation();
   return (
     <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 p-6 rounded-t-2xl">
@@ -19,10 +50,18 @@ function ChatHeader() {
         <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
           <Bot className="w-6 h-6 text-white" />
         </div>
-        <div>
+        <div className="flex-1">
           <h2 className="text-2xl font-bold text-gray-800">{t('visaGuide.title')}</h2>
           <p className="text-gray-600 text-sm">{t('visaGuide.subtitle')}</p>
         </div>
+        <button
+          onClick={onReset}
+          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-500 transition-colors border border-gray-200 hover:border-red-300 px-3 py-1.5 rounded-full"
+          title="Reset conversation"
+        >
+          <RotateCcw className="w-4 h-4" />
+          Reset
+        </button>
       </div>
     </div>
   );
@@ -172,15 +211,35 @@ function ChatInput({ onSendMessage, disabled }: { onSendMessage: (message: strin
 
 // Main Chatbot Page Component
 export function VisaGuide() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: "Hi there 👋, I'm your Immigration Assistant powered by AI! I can help you with visa applications, document requirements, and immigration processes for F1 student visas, H1B work visas, and passport applications. How can I help you today?",
-      isBot: true,
-      timestamp: new Date()
-    }
-  ]);
-  const [isTyping, setIsTyping] = useState(false);
+  const [messages, setMessages] = useState<Message[]>(loadMessages);
+  const [isTyping, setIsTyping] = useState(
+    () => sessionStorage.getItem(CHAT_PENDING_KEY) === 'true'
+  );
+  const { i18n } = useTranslation();
+  const isMountedRef = useRef(true);
+  const messagesRef = useRef(messages);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => { isMountedRef.current = false; };
+  }, []);
+
+  // Keep messagesRef in sync so async handlers always see latest messages
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
+  // Persist messages to sessionStorage whenever they change
+  useEffect(() => {
+    writeToStorage(messages);
+  }, [messages]);
+
+  const handleReset = () => {
+    sessionStorage.removeItem(CHAT_STORAGE_KEY);
+    sessionStorage.removeItem(CHAT_PENDING_KEY);
+    setMessages([{ ...defaultWelcomeMessage, timestamp: new Date() }]);
+    setIsTyping(false);
+  };
 
   // Call the RAG API through the backend
   const generateBotResponse = async (userMessage: string): Promise<string> => {
@@ -192,7 +251,8 @@ export function VisaGuide() {
         },
         body: JSON.stringify({
           query: userMessage,
-          session_id: 'web-session-' + Date.now()
+          session_id: 'web-session-' + Date.now(),
+          language: i18n.language || 'en',
         }),
       });
 
@@ -214,7 +274,6 @@ export function VisaGuide() {
   };
 
   const handleSendMessage = async (messageText: string) => {
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: messageText,
@@ -222,13 +281,17 @@ export function VisaGuide() {
       timestamp: new Date()
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const withUser = [...messagesRef.current, userMessage];
+
+    // Update state + persist user message immediately
+    setMessages(withUser);
     setIsTyping(true);
+    writeToStorage(withUser);
+    sessionStorage.setItem(CHAT_PENDING_KEY, 'true');
 
     try {
-      // Get response from RAG API
       const botText = await generateBotResponse(messageText);
-      
+
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: botText,
@@ -236,7 +299,16 @@ export function VisaGuide() {
         timestamp: new Date()
       };
 
-      setMessages(prev => [...prev, botResponse]);
+      const withBot = [...withUser, botResponse];
+
+      // Always write to storage — component may be unmounted at this point
+      writeToStorage(withBot);
+      sessionStorage.removeItem(CHAT_PENDING_KEY);
+
+      if (isMountedRef.current) {
+        setMessages(withBot);
+        setIsTyping(false);
+      }
     } catch (error) {
       console.error('Error in handleSendMessage:', error);
       const errorMessage: Message = {
@@ -245,9 +317,15 @@ export function VisaGuide() {
         isBot: true,
         timestamp: new Date()
       };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsTyping(false);
+
+      const withError = [...withUser, errorMessage];
+      writeToStorage(withError);
+      sessionStorage.removeItem(CHAT_PENDING_KEY);
+
+      if (isMountedRef.current) {
+        setMessages(withError);
+        setIsTyping(false);
+      }
     }
   };
 
@@ -268,7 +346,7 @@ export function VisaGuide() {
         <div className="max-w-3xl mx-auto">
           {/* Chat Container */}
           <div className="bg-white rounded-2xl shadow-xl border border-green-100 overflow-hidden">
-            <ChatHeader />
+            <ChatHeader onReset={handleReset} />
             <SuggestedQuestions onSelectQuestion={handleSelectQuestion} />
             <ChatMessages messages={messages} isTyping={isTyping} />
             <ChatInput onSendMessage={handleSendMessage} disabled={isTyping} />

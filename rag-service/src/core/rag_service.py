@@ -1,17 +1,12 @@
+# -*- coding: utf-8 -*-
 """
 RAG (Retrieval-Augmented Generation) service.
 Orchestrates document retrieval and LLM-based response generation.
 """
 from typing import List, Tuple
 from langchain_ollama import OllamaLLM
-try:
-    from langchain_core.prompts import PromptTemplate
-except ImportError:
-    from langchain.prompts import PromptTemplate
-try:
-    from langchain_core.documents import Document
-except ImportError:
-    from langchain.schema import Document
+from langchain_core.prompts import PromptTemplate
+from langchain_core.documents import Document
 from loguru import logger
 from src.config import settings
 from src.core.vector_store import VectorStoreManager
@@ -21,19 +16,26 @@ from src.models import SourceDocument
 class RAGService:
     """Service for RAG-based question answering."""
     
+    # Language name mapping
+    LANGUAGE_NAMES = {
+        'en': 'English',
+        'es': 'Spanish (Español)',
+        'hi': 'Hindi (हिंदी)',
+        'te': 'Telugu (తెలుగు)',
+    }
+
     # System prompt template for visa/immigration assistance
-    PROMPT_TEMPLATE = """You are a friendly and reliable immigration assistant helping users with visa, passport, and immigration-related questions.
+    PROMPT_TEMPLATE = """LANGUAGE INSTRUCTION: {language_instruction}
+
+You are a friendly and reliable immigration assistant helping users with visa, passport, and immigration-related questions.
 
 Your goal is to explain things clearly and simply, like a helpful friend who understands immigration processes.
 
 IMPORTANT RULES:
 
-1. LANGUAGE DETECTION:
-   - By DEFAULT, respond in English
-   - ONLY switch to another language if the user's question is CLEARLY and PRIMARILY in that language
-   - English words like "hello", "hi", "what", "how" mean respond in English
-   - If 80%+ of the question is in Spanish/Hindi/French/etc., THEN respond in that language
-   - When in doubt, use English
+1. LANGUAGE: You MUST follow the LANGUAGE INSTRUCTION above strictly.
+   - Always respond in the specified language, no matter what language the user writes in.
+   - This is the most important rule — never override it.
 
 2. If the user greets you (hi, hello, hey, etc.):
    - Respond warmly and briefly
@@ -119,7 +121,7 @@ Answer (plain text only, no markdown):
         self.llm = self._initialize_llm()
         self.prompt = PromptTemplate(
             template=self.PROMPT_TEMPLATE,
-            input_variables=["context", "question"]
+            input_variables=["context", "question", "language_instruction"]
         )
     
     def _initialize_llm(self):
@@ -140,7 +142,8 @@ Answer (plain text only, no markdown):
     def query(
         self,
         question: str,
-        return_sources: bool = True
+        return_sources: bool = True,
+        language: str = 'en'
     ) -> Tuple[str, List[SourceDocument]]:
         """
         Query the RAG system with a question.
@@ -173,14 +176,10 @@ Answer (plain text only, no markdown):
         
         # Generate answer
         try:
-            prompt_text = self.prompt.format(context=context, question=question)
+            language_instruction = self._get_language_instruction(language)
+            prompt_text = self.prompt.format(context=context, question=question, language_instruction=language_instruction)
             response = self.llm.invoke(prompt_text)
-            
-            # Extract answer string from response
-            if hasattr(response, 'content'):
-                answer = str(response.content)
-            else:
-                answer = str(response)
+            answer = str(response)
             
             logger.info("Successfully generated answer")
             
@@ -195,6 +194,17 @@ Answer (plain text only, no markdown):
             logger.error(f"Error generating answer: {str(e)}")
             raise
     
+    def _get_language_instruction(self, language: str) -> str:
+        """Build a language instruction string for the prompt."""
+        name = self.LANGUAGE_NAMES.get(language, 'English')
+        if language == 'en':
+            return "Respond in English."
+        return (
+            f"You MUST respond entirely in {name}. "
+            f"No matter what language the user writes in, always answer in {name}. "
+            "This is mandatory and overrides everything else."
+        )
+
     def _format_context(self, retrieved_docs: List[Tuple[Document, float]]) -> str:
         """
         Format retrieved documents into context string.

@@ -1,119 +1,106 @@
-{
-  "nav": {
-    "home": "Home",
-    "visaGuide": "Visa Guide",
-    "aiInterview": "AI Interview",
-    "updates": "Updates",
-    "checklist": "Checklist",
-    "loginSignup": "Login / Signup"
-  },
-  "hero": {
-    "title": "Visa Made Easy,",
-    "subtitle": "Dreams Made Possible",
-    "getStarted": "Get Started Today"
-  },
-  "services": {
-    "visaGuide": {
-      "title": "Visa Guide",
-      "description": "Comprehensive step-by-step guidance for your visa application process with expert insights."
-    },
-    "updates": {
-      "title": "Latest Updates",
-      "description": "Stay informed with the latest immigration news, policy changes, and visa updates worldwide."
-    },
-    "checklist": {
-      "title": "Document Checklist",
-      "description": "Never miss a document with our personalized checklist tailored to your visa type."
-    }
-  },
-  "visaTypes": {
-    "title": "Popular Visa Types",
-    "description": "Choose the visa type that suits your purpose and get personalized guidance.",
-    "student": {
-      "title": "Student Visa",
-      "description": "Everything you need for your educational journey abroad.",
-      "applyNow": "Apply Now"
-    },
-    "work": {
-      "title": "Work Visa",
-      "description": "Professional opportunities await - let us help you get there.",
-      "applyNow": "Apply Now"
-    },
-    "tourist": {
-      "title": "Tourist Visa",
-      "description": "Explore the world hassle-free with proper documentation.",
-      "applyNow": "Apply Now"
-    }
-  },
-  "countries": {
-    "title": "Countries We Cover",
-    "description": "Expert guidance for visa applications to popular destinations worldwide."
-  },
-  "whyChooseUs": {
-    "title": "Why Choose RouteX?",
-    "professional": {
-      "title": "Professional Team",
-      "description": "Expert advisors with years of immigration experience"
-    },
-    "support": {
-      "title": "24/7 Support",
-      "description": "Round-the-clock assistance for all your queries"
-    },
-    "success": {
-      "title": "High Success Rate",
-      "description": "Proven track record of successful visa applications"
-    }
-  },
-  "cta": {
-    "title": "Ready to Start Your Journey?",
-    "description": "Join thousands who have successfully obtained their visas with RouteX.",
-    "button": "Get Started Now"
-  },
-  "footer": {
-    "description": "Your trusted partner for visa applications and immigration guidance worldwide.",
-    "quickLinks": "Quick Links",
-    "support": "Support",
-    "faq": "FAQ",
-    "contact": "Contact Us",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "allRightsReserved": "All rights reserved."
-  },
-  "visaGuide": {
-    "title": "Ask WanderBot",
-    "subtitle": "Your AI Travel Guide — Here to help you explore visas, tours, and destinations.",
-    "quickQuestions": "Quick questions to get you started:",
-    "typePlaceholder": "Type your message here...",
-    "send": "Send"
-  },
-  "aiInterview": {
-    "title": "AI Interview Practice",
-    "subtitle": "Practice your interview skills with our AI-powered simulator",
-    "startInterview": "Start Interview",
-    "question": "Question",
-    "of": "of",
-    "timeRemaining": "Time Remaining",
-    "tips": "Tips",
-    "nextQuestion": "Next Question",
-    "previousQuestion": "Previous",
-    "finishInterview": "Finish Interview"
-  },
-  "updates": {
-    "title": "Latest Updates",
-    "subtitle": "Stay informed with the latest visa policy and regulation updates",
-    "allCountries": "All Countries",
-    "allCategories": "All Categories",
-    "featured": "Featured",
-    "readMore": "Read More",
-    "noNews": "No news articles found"
-  },
-  "checklist": {
-    "title": "Visa Document Checklist",
-    "subtitle": "Track your visa application documents",
-    "selectVisa": "Select Visa Type",
-    "progress": "Progress",
-    "completed": "Completed",
-    "downloadChecklist": "Download Checklist",
-    "resetProgress": "Reset Progress"
-  }
+﻿{
+    "nav":  {
+                "home":  "Home",
+                "visaGuide":  "Visa Guide",
+                "updates":  "Updates",
+                "checklist":  "Checklist",
+                "loginSignup":  "Login / Signup"
+            },
+    "hero":  {
+                 "title":  "Visa Made Easy,",
+                 "subtitle":  "Dreams Made Possible",
+                 "getStarted":  "Get Started Today"
+             },
+    "services":  {
+                     "visaGuide":  {
+                                       "title":  "Visa Guide",
+                                       "description":  "Comprehensive step-by-step guidance for your visa application process with expert insights."
+                                   },
+                     "updates":  {
+                                     "title":  "Latest Updates",
+                                     "description":  "Stay informed with the latest immigration news, policy changes, and visa updates worldwide."
+                                 },
+                     "checklist":  {
+                                       "title":  "Document Checklist",
+                                       "description":  "Never miss a document with our personalized checklist tailored to your visa type."
+                                   }
+                 },
+    "visaTypes":  {
+                      "title":  "Popular Visa Types",
+                      "description":  "Choose the visa type that suits your purpose and get personalized guidance.",
+                      "student":  {
+                                      "title":  "Student Visa",
+                                      "description":  "Everything you need for your educational journey abroad.",
+                                      "applyNow":  "Apply Now"
+                                  },
+                      "work":  {
+                                   "title":  "Work Visa",
+                                   "description":  "Professional opportunities await - let us help you get there.",
+                                   "applyNow":  "Apply Now"
+                               },
+                      "tourist":  {
+                                      "title":  "Tourist Visa",
+                                      "description":  "Explore the world hassle-free with proper documentation.",
+                                      "applyNow":  "Apply Now"
+                                  }
+                  },
+    "countries":  {
+                      "title":  "Countries We Cover",
+                      "description":  "Expert guidance for visa applications to popular destinations worldwide."
+                  },
+    "whyChooseUs":  {
+                        "title":  "Why Choose RouteX?",
+                        "professional":  {
+                                             "title":  "Professional Team",
+                                             "description":  "Expert advisors with years of immigration experience"
+                                         },
+                        "support":  {
+                                        "title":  "24/7 Support",
+                                        "description":  "Round-the-clock assistance for all your queries"
+                                    },
+                        "success":  {
+                                        "title":  "High Success Rate",
+                                        "description":  "Proven track record of successful visa applications"
+                                    }
+                    },
+    "cta":  {
+                "title":  "Ready to Start Your Journey?",
+                "description":  "Join thousands who have successfully obtained their visas with RouteX.",
+                "button":  "Get Started Now"
+            },
+    "footer":  {
+                   "description":  "Your trusted partner for visa applications and immigration guidance worldwide.",
+                   "quickLinks":  "Quick Links",
+                   "support":  "Support",
+                   "faq":  "FAQ",
+                   "contact":  "Contact Us",
+                   "privacy":  "Privacy Policy",
+                   "terms":  "Terms of Service",
+                   "allRightsReserved":  "All rights reserved."
+               },
+    "visaGuide":  {
+                      "title":  "Ask WanderBot",
+                      "subtitle":  "Your AI Travel Guide - Here to help you explore visas, tours, and destinations.",
+                      "quickQuestions":  "Quick questions to get you started:",
+                      "typePlaceholder":  "Type your message here...",
+                      "send":  "Send"
+                  },
+    "updates":  {
+                    "title":  "Latest Updates",
+                    "subtitle":  "Stay informed with the latest visa policy and regulation updates",
+                    "allCountries":  "All Countries",
+                    "allCategories":  "All Categories",
+                    "featured":  "Featured",
+                    "readMore":  "Read More",
+                    "noNews":  "No news articles found"
+                },
+    "checklist":  {
+                      "title":  "Visa Document Checklist",
+                      "subtitle":  "Track your visa application documents",
+                      "selectVisa":  "Select Visa Type",
+                      "progress":  "Progress",
+                      "completed":  "Completed",
+                      "downloadChecklist":  "Download Checklist",
+                      "resetProgress":  "Reset Progress"
+                  }
 }

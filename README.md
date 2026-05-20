@@ -1,127 +1,137 @@
 # Immigration Helper
 
-A full-stack web application for visa and immigration assistance with AI-powered RAG chatbot.
+A full-stack web application for visa and immigration assistance. Provides an AI-powered visa Q&A chatbot, real-time immigration news, interactive visa document checklists, and multi-language support.
 
-## 🚀 Quick Start
+## Features
 
-### Prerequisites
-- Node.js 18+
-- Python 3.10+
-- ONE of: Groq API (FREE) / Ollama (FREE) / OpenAI (paid)
+- **Visa Guide Chatbot** — Ask questions about visa types and requirements; powered by a Python RAG service with pre-loaded guides for H1B, F1, UK, Canada, Australia, and passport applications
+- **Immigration News** — Live immigration news feed with filtering by country and category
+- **Visa Checklist** — Interactive document checklists for tourist, student, and work visas
+- **Multi-language UI** — English, Spanish, Hindi, and Telugu
 
-### 1. Configure (Single .env file)
-```powershell
-cp .env.example .env
-# Edit .env - Add your API key(s)
+## Tech Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| Frontend | React 18, TypeScript, Vite, TailwindCSS, i18next |
+| Backend | Node.js, Express, TypeScript |
+| RAG Service | Python, FastAPI, LangChain, ChromaDB |
+| LLM | Groq (free) / Ollama (free) / OpenAI |
+
+## Project Structure
+
+```
+Immigration-Helper/
+├── .env                        # Unified config for all services
+├── client/                     # React frontend (port 5173)
+│   └── src/
+│       ├── pages/              # Home, VisaGuide, Updates, Checklist
+│       ├── components/         # Navbar, Footer, UI primitives
+│       ├── hooks/              # useNews (news feed hook)
+│       └── i18n/               # Translations (en, es, hi, te)
+├── server/                     # Node.js/Express backend (port 5000)
+│   └── src/
+│       ├── routes/             # visaChatRoutes, newsRoutes
+│       └── services/           # newsService, geminiService
+├── rag-service/                # Python RAG chatbot (port 8000)
+│   ├── src/                    # FastAPI app, LangChain pipeline
+│   └── data/documents/         # Visa guide markdown files
+└── database/                   # SQL schema
 ```
 
-**Recommended FREE setup:**
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- Python 3.10+
+- A Groq API key (free at [console.groq.com](https://console.groq.com))
+
+### 1. Configure environment
+
+```powershell
+cp .env.example .env
+```
+
+Open `.env` and set at minimum:
+
 ```env
 LLM_PROVIDER=groq
-GROQ_API_KEY=your_key_here          # Get from https://console.groq.com
+GROQ_API_KEY=your_key_here
 EMBEDDING_PROVIDER=huggingface
 ```
 
-### 2. Start Python RAG Service
+### 2. Start the RAG service
+
 ```powershell
 cd rag-service
 python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
-python -m src.scripts.ingest_documents
+python -m src.scripts.ingest_documents   # run once to build the vector store
 uvicorn src.main:app --reload
 ```
 
-### 3. Start Node.js Backend
+### 3. Start the backend
+
 ```powershell
 cd server
 npm install
 npm run dev
 ```
 
-### 4. Start React Frontend
+### 4. Start the frontend
+
 ```powershell
 cd client
 npm install
 npm run dev
 ```
 
-### 5. Open App
+### 5. Open the app
+
 http://localhost:5173
 
-## 📁 Structure
+## API Endpoints
 
-```
-Immigration-Helper/
-├── .env                   # SINGLE unified configuration (NEW)
-├── client/                # React frontend
-├── server/                # Node.js/Express backend  
-├── rag-service/          # Python RAG chatbot (NEW)
-│   └── data/documents/   # Visa guides (pre-loaded)
-├── README.md             # This file
-└── SETUP_RAG.md         # Detailed guide
-```
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:5173 |
+| Backend | http://localhost:5000 |
+| RAG API | http://localhost:8000 |
+| RAG Docs | http://localhost:8000/docs |
 
-## ⚙️ LLM Options
-
-All configured in single `.env` file:
-
-| Provider | Cost | Speed | Setup |
-|----------|------|-------|-------|
-| **Groq** ⭐ | FREE | Very Fast | Get key at console.groq.com |
-| **Ollama** | FREE | Medium | Install + download model |
-| **OpenAI** | ~$0.02/query | Fast | Get key at platform.openai.com |
-
-## 🔗 Endpoints
-
-- Frontend: http://localhost:5173
-- Backend: http://localhost:5000
-- RAG API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
-
-### Chat with Bot
+**Visa chatbot query:**
 ```bash
-POST /api/visa-chat/query
-{
-  "query": "What documents do I need for H1B visa?"
-}
+POST http://localhost:5000/api/visa-chat/query
+Content-Type: application/json
+
+{ "query": "What documents do I need for an H1B visa?" }
 ```
 
-## 🎯 Features
+## Adding Visa Guides
 
-✅ AI-powered visa Q&A chatbot  
-✅ Semantic search (understands meaning)  
-✅ Source attribution  
-✅ Multiple FREE LLM options  
-✅ Pre-loaded visa guides (H1B, F1, Passport)  
+1. Add a `.md`, `.txt`, `.pdf`, or `.docx` file to `rag-service/data/documents/`
+2. Re-run ingestion: `python -m src.scripts.ingest_documents`
+3. Restart the RAG service
 
-## 📚 Tech Stack
+## Supported LLM Providers
 
-**Frontend:** React 18, TypeScript, Vite, TailwindCSS  
-**Backend:** Node.js, Express, TypeScript, MongoDB  
-**RAG:** Python, FastAPI, LangChain, ChromaDB  
-**LLMs:** Groq/Ollama/OpenAI  
+| Provider | Cost | Notes |
+|----------|------|-------|
+| **Groq** | Free | Recommended — fast inference |
+| **Ollama** | Free | Requires local model download |
+| **OpenAI** | Paid | Set `LLM_PROVIDER=openai` |
 
-## 🔧 Adding Documents
-
-1. Add PDF/DOCX/TXT/MD to `rag-service/data/documents/`
-2. Run: `python -m src.scripts.ingest_documents`  
-3. Restart RAG service
-
-## 📖 Documentation
-
-**[SETUP_RAG.md](./SETUP_RAG.md)** - Complete setup and troubleshooting guide
-
-## 🐛 Common Issues
+## Common Issues
 
 | Issue | Fix |
 |-------|-----|
-| "Vector store not initialized" | Run document ingestion script |
-| "RAG service unavailable" | Check port 8000 available |
-| Python import errors | Activate venv + reinstall |
+| "Vector store not initialized" | Run `python -m src.scripts.ingest_documents` |
+| "RAG service unavailable" | Ensure port 8000 is free and venv is activated |
+| Python import errors | Re-activate venv and run `pip install -r requirements.txt` |
+| News feed not loading | Check `NEWSDATA_API_KEY` is set in `.env` |
 
-See [SETUP_RAG.md](./SETUP_RAG.md) for detailed troubleshooting.
-
-## 📝 License
+## License
 
 MIT

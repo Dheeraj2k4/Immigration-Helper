@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Chat service for handling user queries.
 """
@@ -5,6 +6,13 @@ from typing import Optional
 from loguru import logger
 from src.core import RAGService
 from src.models import ChatQueryRequest, ChatQueryResponse
+
+GREETING_RESPONSES = {
+    'en': "Hi there! 👋 I'm here to help with your visa and immigration questions. What would you like to know?",
+    'es': "¡Hola! 👋 Estoy aquí para ayudarte con preguntas sobre visas e inmigración. ¿En qué puedo ayudarte?",
+    'hi': "नमस्ते! 👋 मैं यहाँ आपके वीज़ा और आव्रजन सवालों में मदद के लिए हूँ। आप क्या जानना चाहते हैं?",
+    'te': "నమస్కారం! 👋 వీసా మరియు ఇమ్మిగ్రేషన్ ప్రశ్నలలో మీకు సహాయం చేయడానికి నేను ఇక్కడ ఉన్నాను. మీకు ఏమి తెలుసుకోవాలనుకుంటున్నారు?",
+}
 
 
 class ChatService:
@@ -31,11 +39,14 @@ class ChatService:
         """
         logger.info(f"Processing chat query (session: {request.session_id})")
         
+        language = request.language or 'en'
+
         try:
-            # Quick response for greetings
+            # Quick response for greetings (language-aware)
             if self._is_greeting(request.query):
+                greeting = GREETING_RESPONSES.get(language, GREETING_RESPONSES['en'])
                 return ChatQueryResponse(
-                    answer="Hi there! 👋 I'm here to help with your visa and immigration questions. What would you like to know?",
+                    answer=greeting,
                     sources=[],
                     session_id=request.session_id,
                     confidence=1.0
@@ -54,7 +65,8 @@ class ChatService:
             # Query RAG system
             answer, sources = self.rag_service.query(
                 question=request.query,
-                return_sources=True
+                return_sources=True,
+                language=language
             )
             
             # Calculate confidence based on source scores

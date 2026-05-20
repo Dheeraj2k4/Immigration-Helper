@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowRight, Home, FileText, MessageSquare, Bell, CreditCard, Globe } from 'lucide-react';
+import { Menu, X, ArrowRight, Home, FileText, Bell, CreditCard, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import logoSvg from '@/assets/OBJECTS.svg';
@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 const navigationItems = [
   { name: 'nav.home', href: '/', icon: Home },
   { name: 'nav.visaGuide', href: '/visa-guide', icon: FileText },
-  // { name: 'nav.aiInterview', href: '/ai-interview', icon: MessageSquare },
   { name: 'nav.updates', href: '/updates', icon: Bell },
   { name: 'nav.checklist', href: '/checklist', icon: CreditCard },
 ];
@@ -129,7 +128,19 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                    style={{
+                      position: 'absolute',
+                      right: 0,
+                      marginTop: '0.5rem',
+                      width: '12rem',
+                      backgroundColor: 'white',
+                      borderRadius: '0.5rem',
+                      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+                      border: '1px solid #e5e7eb',
+                      paddingTop: '0.5rem',
+                      paddingBottom: '0.5rem',
+                      zIndex: 50,
+                    }}
                   >
                     {languages.map((lang) => (
                       <button

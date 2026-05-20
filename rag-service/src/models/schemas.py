@@ -9,13 +9,15 @@ class ChatQueryRequest(BaseModel):
     """Request model for chat queries."""
     query: str = Field(..., min_length=1, max_length=1000, description="User question about visa/immigration")
     session_id: Optional[str] = Field(None, description="Optional session ID for conversation tracking")
+    language: Optional[str] = Field(None, description="Language code for bot response (en/es/hi/te)")
     
     model_config = {
         "json_schema_extra": {
             "examples": [
                 {
                     "query": "What documents do I need for H1B visa?",
-                    "session_id": "user-123-session"
+                    "session_id": "user-123-session",
+                    "language": "en"
                 }
             ]
         }

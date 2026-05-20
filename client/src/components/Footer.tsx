@@ -52,7 +52,6 @@ export function Footer() {
             <h4 className="font-semibold text-white mb-3">Services</h4>
             <ul className="space-y-2 text-sm">
               <li><Link to="/visa-guide" className="text-white opacity-80 hover:text-white hover:opacity-100 transition-opacity">{t('nav.visaGuide')}</Link></li>
-              <li><Link to="/ai-interview" className="text-white opacity-80 hover:text-white hover:opacity-100 transition-opacity">{t('nav.aiInterview')}</Link></li>
               <li><Link to="/plans" className="text-white opacity-80 hover:text-white hover:opacity-100 transition-opacity">Plans</Link></li>
             </ul>
           </div>
